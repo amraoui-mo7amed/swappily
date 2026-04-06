@@ -1,0 +1,246 @@
+{% extends "dash/dash_index.html" %}
+{% load i18n %}
+{% load static %}
+{% load tags %}
+
+{% block dashTitle %}
+{% trans "Swap Requests" %}
+{% endblock dashTitle %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/skills.css' %}?v={% now 'U' %}">
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script src="{% static 'js/skills.js' %}?v={% now 'U' %}"></script>
+{% endblock extra_js %}
+
+{% block dashContent %}
+<div class="container-fluid">
+    <ul class="nav nav-pills mb-4 gap-2" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-3 px-4 py-2 fw-bold" id="received-tab" data-bs-toggle="pill" data-bs-target="#received" type="button" role="tab">
+                <i class="fas fa-inbox me-2"></i>{% trans "Received" %}
+                {% if received_requests.paginator.count > 0 %}
+                <span class="badge bg-light text-primary ms-1">{{ received_requests.paginator.count }}</span>
+                {% endif %}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-3 px-4 py-2 fw-bold" id="sent-tab" data-bs-toggle="pill" data-bs-target="#sent" type="button" role="tab">
+                <i class="fas fa-paper-plane me-2"></i>{% trans "Sent" %}
+                {% if sent_requests.paginator.count > 0 %}
+                <span class="badge bg-light text-primary ms-1">{{ sent_requests.paginator.count }}</span>
+                {% endif %}
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="received" role="tabpanel">
+            {% if received_requests %}
+            <div class="row g-4">
+                {% for req in received_requests %}
+                <div class="col-lg-6 col-md-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white swap-request-card overflow-hidden">
+                        <div class="row g-0">
+                            <div class="col-12">
+                                <div class="p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-4">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                                style="width: 50px; height: 50px; font-size: 1.1rem;">
+                                                {{ req.requester.username|slice:":1"|upper }}
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">{{ req.requester.get_full_name|default:req.requester.username }}</h6>
+                                                <p class="text-muted small mb-0">
+                                                    <i class="fas fa-clock me-1"></i>{{ req.created_at|timesince }} {% trans "ago" %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span class="badge 
+                                            {% if req.status == 'pending' %}bg-warning bg-opacity-10 text-warning
+                                            {% elif req.status == 'accepted' %}bg-success bg-opacity-10 text-success
+                                            {% else %}bg-danger bg-opacity-10 text-danger{% endif %} rounded-pill px-3 py-2">
+                                            <i class="fas 
+                                                {% if req.status == 'pending' %}fa-clock
+                                                {% elif req.status == 'accepted' %}fa-check-circle
+                                                {% else %}fa-times-circle{% endif %} me-1"></i>
+                                            {{ req.get_status_display }}
+                                        </span>
+                                    </div>
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <div class="swap-skill-card bg-primary bg-opacity-5 rounded-3 p-3 border-start border-4 border-primary">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-hand-holding-heart text-primary me-2"></i>
+                                                    <small class="text-muted text-uppercase fw-bold">{% trans "They Offer" %}</small>
+                                                </div>
+                                                <h6 class="fw-bold mb-1">{{ req.offered_skill.skill_title }}</h6>
+                                                <p class="text-muted small mb-0">{{ req.offered_skill.skill_description|truncatewords:8 }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="swap-skill-card bg-success bg-opacity-5 rounded-3 p-3 border-start border-4 border-success">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-bullseye text-success me-2"></i>
+                                                    <small class="text-muted text-uppercase fw-bold">{% trans "They Want" %}</small>
+                                                </div>
+                                                <h6 class="fw-bold mb-1">{{ req.target_skill.skill_title }}</h6>
+                                                <p class="text-muted small mb-0">{{ req.target_skill.skill_description|truncatewords:8 }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% if req.message %}
+                                    <div class="bg-light p-3 rounded-3 mb-3 border-start border-3 border-info">
+                                        <div class="d-flex align-items-start">
+                                            <i class="fas fa-quote-left text-info me-2 mt-1"></i>
+                                            <div>
+                                                <small class="text-muted fw-bold">{% trans "Message" %}</small>
+                                                <p class="mb-0 small">{{ req.message }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if req.status == 'pending' %}
+                                    <div class="d-flex gap-2">
+                                        <button type="button" 
+                                            class="btn btn-success flex-grow-1 rounded-3 py-2 fw-bold"
+                                            data-action="accept"
+                                            data-request-id="{{ req.pk }}"
+                                            data-swal-title="{% trans 'Accept Request?' %}"
+                                            data-swal-text="{% trans 'You will exchange skills with' %} {{ req.requester.username }}."
+                                            data-swal-confirm="{% trans 'Yes, accept!' %}"
+                                            data-swal-cancel="{% trans 'Cancel' %}">
+                                            <i class="fas fa-check me-2"></i>{% trans "Accept" %}
+                                        </button>
+                                        <button type="button" 
+                                            class="btn btn-outline-danger flex-grow-1 rounded-3 py-2 fw-bold"
+                                            data-action="reject"
+                                            data-request-id="{{ req.pk }}"
+                                            data-swal-title="{% trans 'Reject Request?' %}"
+                                            data-swal-text="{% trans 'This will notify' %} {{ req.requester.username }}."
+                                            data-swal-confirm="{% trans 'Yes, reject' %}"
+                                            data-swal-cancel="{% trans 'Cancel' %}">
+                                            <i class="fas fa-times me-2"></i>{% trans "Reject" %}
+                                        </button>
+                                    </div>
+                                    <a href="{% url 'dash:swap_request_detail' req.pk %}" class="btn btn-outline-secondary w-100 rounded-3 py-2 mt-2">
+                                        <i class="fas fa-eye me-1"></i> {% trans "View Full Details" %}
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'dash:swap_request_detail' req.pk %}" class="btn btn-outline-primary w-100 rounded-3 py-2">
+                                        <i class="fas fa-eye me-1"></i> {% trans "View Details" %}
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm p-5 text-center rounded-4 bg-white">
+                <i class="fas fa-inbox fa-4x text-light mb-3"></i>
+                <h5 class="text-muted fw-bold">{% trans "No received requests" %}</h5>
+                <p class="text-muted mb-0">{% trans "When someone requests to swap skills with you, it will appear here." %}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="tab-pane fade" id="sent" role="tabpanel">
+            {% if sent_requests %}
+            <div class="row g-4">
+                {% for req in sent_requests %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white swap-request-card overflow-hidden">
+                        <div class="p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-circle bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                        style="width: 50px; height: 50px; font-size: 1.1rem;">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">{% trans "Request to" %} {{ req.target_skill.user.get_full_name|default:req.target_skill.user.username }}</h6>
+                                        <p class="text-muted small mb-0">
+                                            <i class="fas fa-clock me-1"></i>{{ req.created_at|timesince }} {% trans "ago" %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="badge 
+                                    {% if req.status == 'pending' %}bg-warning bg-opacity-10 text-warning
+                                    {% elif req.status == 'accepted' %}bg-success bg-opacity-10 text-success
+                                    {% else %}bg-danger bg-opacity-10 text-danger{% endif %} rounded-pill px-3 py-2">
+                                    <i class="fas 
+                                        {% if req.status == 'pending' %}fa-clock
+                                        {% elif req.status == 'accepted' %}fa-check-circle
+                                        {% else %}fa-times-circle{% endif %} me-1"></i>
+                                    {{ req.get_status_display }}
+                                </span>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="swap-skill-card bg-primary bg-opacity-5 rounded-3 p-3 border-start border-4 border-primary">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-hand-holding-heart text-primary me-2"></i>
+                                            <small class="text-muted text-uppercase fw-bold">{% trans "You Offer" %}</small>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">{{ req.offered_skill.skill_title }}</h6>
+                                        <p class="text-muted small mb-0">{{ req.offered_skill.skill_description|truncatewords:8 }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="swap-skill-card bg-success bg-opacity-5 rounded-3 p-3 border-start border-4 border-success">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-bullseye text-success me-2"></i>
+                                            <small class="text-muted text-uppercase fw-bold">{% trans "You Want" %}</small>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">{{ req.target_skill.skill_title }}</h6>
+                                        <p class="text-muted small mb-0">{{ req.target_skill.skill_description|truncatewords:8 }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'dash:swap_request_detail' req.pk %}" class="btn btn-outline-primary flex-grow-1 rounded-3 py-2">
+                                    <i class="fas fa-eye me-1"></i> {% trans "View Details" %}
+                                </a>
+                                {% if req.status == 'pending' %}
+                                <button type="button" 
+                                    class="btn btn-outline-danger rounded-3 py-2"
+                                    data-action="cancel"
+                                    data-request-id="{{ req.pk }}"
+                                    data-swal-title="{% trans 'Cancel Request?' %}"
+                                    data-swal-text="{% trans 'This request will be permanently removed.' %}"
+                                    data-swal-confirm="{% trans 'Yes, cancel' %}"
+                                    data-swal-cancel="{% trans 'No, keep it' %}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm p-5 text-center rounded-4 bg-white">
+                <i class="fas fa-paper-plane fa-4x text-light mb-3"></i>
+                <h5 class="text-muted fw-bold">{% trans "No sent requests" %}</h5>
+                <p class="text-muted mb-0">{% trans "Browse skills and send swap requests to start exchanging!" %}</p>
+                <a href="{% url 'dash:skill_list' %}" class="btn btn-primary rounded-3 mt-3">
+                    <i class="fas fa-search me-1"></i> {% trans "Browse Skills" %}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock dashContent %}

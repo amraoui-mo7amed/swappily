@@ -1,0 +1,247 @@
+{% extends "dash/dash_index.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block dashTitle %}
+{% trans "Swap Request Details" %}
+{% endblock dashTitle %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/skills.css' %}?v={% now 'U' %}">
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script src="{% static 'js/skills.js' %}?v={% now 'U' %}"></script>
+{% endblock extra_js %}
+
+{% block dashContent %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'dash:swap_request_list' %}" class="btn btn-dark shadow-sm border-0 rounded-3 px-3 py-2 text-light">
+            <i class="fas fa-arrow-{% if IS_RTL %}right{% else %}left{% endif %} me-2"></i> {% trans "Back to Requests" %}
+        </a>
+        <span class="badge 
+            {% if swap_request.status == 'pending' %}bg-warning bg-opacity-10 text-warning
+            {% elif swap_request.status == 'accepted' %}bg-success bg-opacity-10 text-success
+            {% else %}bg-danger bg-opacity-10 text-danger{% endif %} rounded-pill px-4 py-2 fs-6">
+            <i class="fas 
+                {% if swap_request.status == 'pending' %}fa-clock
+                {% elif swap_request.status == 'accepted' %}fa-check-circle
+                {% else %}fa-times-circle{% endif %} me-2"></i>
+            {{ swap_request.get_status_display }}
+        </span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+                <div class="card-header bg-transparent border-0 p-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-hand-holding-heart text-primary me-2"></i>
+                        {% trans "Offered Skill" %}
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar-circle bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3"
+                            style="width: 50px; height: 50px;">
+                            {{ swap_request.offered_skill.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <p class="fw-bold mb-0">{{ swap_request.offered_skill.user.get_full_name|default:swap_request.offered_skill.user.username }}</p>
+                            <p class="text-muted small mb-0">{% trans "Offering" %}</p>
+                        </div>
+                    </div>
+
+                    {% if swap_request.offered_skill.skill_image %}
+                    <img src="{{ swap_request.offered_skill.skill_image.url }}" alt="{{ swap_request.offered_skill.skill_title }}" class="img-fluid rounded-3 mb-3">
+                    {% else %}
+                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center mb-3" style="height: 150px;">
+                        <i class="fas fa-lightbulb text-muted fa-2x"></i>
+                    </div>
+                    {% endif %}
+
+                    <h5 class="fw-bold mb-2">{{ swap_request.offered_skill.skill_title }}</h5>
+                    <p class="text-muted mb-0">{{ swap_request.offered_skill.skill_description }}</p>
+
+                    {% if swap_request.requester_pdf or swap_request.requester_video %}
+                    <div class="mt-3 p-3 bg-primary bg-opacity-5 rounded-3">
+                        <h6 class="fw-bold small mb-2">
+                            <i class="fas fa-paperclip text-primary me-1"></i>
+                            {% trans "Attached Files" %}
+                        </h6>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if swap_request.requester_pdf %}
+                            <a href="{{ swap_request.requester_pdf.url }}" class="btn btn-outline-primary btn-sm rounded-3" target="_blank">
+                                <i class="fas fa-file-pdf me-1"></i> {% trans "PDF" %}
+                            </a>
+                            {% endif %}
+                            {% if swap_request.requester_video %}
+                            <a href="{{ swap_request.requester_video.url }}" class="btn btn-outline-primary btn-sm rounded-3" target="_blank">
+                                <i class="fas fa-video me-1"></i> {% trans "Video" %}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+                <div class="card-header bg-transparent border-0 p-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-bullseye text-success me-2"></i>
+                        {% trans "Requested Skill" %}
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar-circle bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3"
+                            style="width: 50px; height: 50px;">
+                            {{ swap_request.target_skill.user.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <p class="fw-bold mb-0">{{ swap_request.target_skill.user.get_full_name|default:swap_request.target_skill.user.username }}</p>
+                            <p class="text-muted small mb-0">{% trans "Owner" %}</p>
+                        </div>
+                    </div>
+
+                    {% if swap_request.target_skill.skill_image %}
+                    <img src="{{ swap_request.target_skill.skill_image.url }}" alt="{{ swap_request.target_skill.skill_title }}" class="img-fluid rounded-3 mb-3">
+                    {% else %}
+                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center mb-3" style="height: 150px;">
+                        <i class="fas fa-lightbulb text-muted fa-2x"></i>
+                    </div>
+                    {% endif %}
+
+                    <h5 class="fw-bold mb-2">{{ swap_request.target_skill.skill_title }}</h5>
+                    <p class="text-muted mb-0">{{ swap_request.target_skill.skill_description }}</p>
+
+                    {% if swap_request.owner_pdf or swap_request.owner_video %}
+                    <div class="mt-3 p-3 bg-success bg-opacity-5 rounded-3">
+                        <h6 class="fw-bold small mb-2">
+                            <i class="fas fa-paperclip text-success me-1"></i>
+                            {% trans "Owner's Files" %}
+                        </h6>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% if swap_request.owner_pdf %}
+                            <a href="{{ swap_request.owner_pdf.url }}" class="btn btn-outline-success btn-sm rounded-3" target="_blank">
+                                <i class="fas fa-file-pdf me-1"></i> {% trans "PDF" %}
+                            </a>
+                            {% endif %}
+                            {% if swap_request.owner_video %}
+                            <a href="{{ swap_request.owner_video.url }}" class="btn btn-outline-success btn-sm rounded-3" target="_blank">
+                                <i class="fas fa-video me-1"></i> {% trans "Video" %}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if swap_request.message %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-white">
+                <div class="card-header bg-transparent border-0 p-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-comment text-info me-2"></i>
+                        {% trans "Message from" %} {{ swap_request.requester.username }}
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="bg-light p-4 rounded-3 border-start border-4 border-info">
+                        <p class="mb-0">{{ swap_request.message|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-white">
+                <div class="card-header bg-transparent border-0 p-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        {% trans "Request Information" %}
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted text-uppercase">{% trans "Created" %}</small>
+                            <p class="fw-bold mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                {{ swap_request.created_at|date:"d M Y, H:i" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted text-uppercase">{% trans "Last Updated" %}</small>
+                            <p class="fw-bold mb-0">
+                                <i class="fas fa-clock me-2"></i>
+                                {{ swap_request.updated_at|date:"d M Y, H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if swap_request.status == 'pending' and is_recipient %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient" style="background: linear-gradient(135deg, var(--bs-success), var(--bs-primary));">
+                <div class="card-body p-4 text-white text-center">
+                    <h5 class="fw-bold mb-3">{% trans "Do you want to accept this swap request?" %}</h5>
+                    <p class="mb-3 opacity-75">{% trans "You can share your learning materials when accepting." %}</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'dash:swap_request_accept_form' swap_request.pk %}" class="btn btn-light text-success fw-bold rounded-3 px-5 py-3 shadow-sm">
+                            <i class="fas fa-check me-2"></i> {% trans "Accept" %}
+                        </a>
+                        <button type="button"
+                            class="btn btn-outline-light fw-bold rounded-3 px-5 py-3"
+                            data-action="reject"
+                            data-request-id="{{ swap_request.pk }}"
+                            data-swal-title="{% trans 'Reject Request?' %}"
+                            data-swal-text="{% trans 'This will notify' %} {{ swap_request.requester.username }}."
+                            data-swal-confirm="{% trans 'Yes, reject' %}"
+                            data-swal-cancel="{% trans 'Cancel' %}">
+                            <i class="fas fa-times me-2"></i> {% trans "Reject" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if swap_request.status == 'pending' and is_requester %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 bg-light">
+                <div class="card-body p-4 text-center">
+                    <button type="button"
+                        class="btn btn-outline-danger fw-bold rounded-3 px-5 py-3"
+                        data-action="cancel"
+                        data-request-id="{{ swap_request.pk }}"
+                        data-swal-title="{% trans 'Cancel Request?' %}"
+                        data-swal-text="{% trans 'This request will be permanently removed.' %}"
+                        data-swal-confirm="{% trans 'Yes, cancel' %}"
+                        data-swal-cancel="{% trans 'No, keep it' %}">
+                        <i class="fas fa-times me-2"></i> {% trans "Cancel Request" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock dashContent %}

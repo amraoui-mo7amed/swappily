@@ -1,0 +1,126 @@
+{% extends "dash/dash_index.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block dashTitle %}
+{% trans "Request Swap" %}
+{% endblock dashTitle %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/skills.css' %}?v={% now 'U' %}">
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script src="{% static 'js/skills.js' %}?v={% now 'U' %}"></script>
+{% endblock extra_js %}
+
+{% block dashContent %}
+<div class="container-fluid">
+<div class="row justify-content-center">
+<div class="col-12 col-lg-8">
+<div class="card border-0 shadow-sm rounded-4 bg-white">
+<div class="card-header bg-transparent border-0 p-4">
+<div class="d-flex justify-content-between align-items-center">
+<h4 class="fw-bold mb-0">
+<i class="fas fa-exchange-alt text-success me-2"></i>
+{% trans "Request Skill Swap" %}
+</h4>
+<a href="{% url 'dash:skill_detail' target_skill.pk %}"
+class="btn btn-outline-secondary rounded-3">
+<i class="fas fa-times me-1"></i> {% trans "Cancel" %}
+</a>
+</div>
+</div>
+
+<div class="card-body p-4 border-bottom">
+<h6 class="text-muted text-uppercase small mb-3">{% trans "You are requesting" %}</h6>
+<div class="d-flex align-items-center p-3 bg-light rounded-3">
+{% if target_skill.skill_image %}
+<img src="{{ target_skill.skill_image.url }}" alt="{{ target_skill.skill_title }}" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+{% else %}
+<div class="bg-primary bg-opacity-10 rounded me-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+<i class="fas fa-lightbulb text-primary fa-2x"></i>
+</div>
+{% endif %}
+<div>
+<h5 class="fw-bold mb-1">{{ target_skill.skill_title }}</h5>
+<p class="text-muted small mb-0">{{ target_skill.user.get_full_name|default:target_skill.user.username }}</p>
+</div>
+</div>
+</div>
+
+<form id="swapRequestForm" method="post" enctype="multipart/form-data" class="form">
+{% csrf_token %}
+<div class="card-body p-4">
+<div class="mb-4">
+{% if user_skills %}
+{% include "components/custom_select.html" with id="offeredSkillSelect" name="offered_skill" label=_("Select Your Skill to Offer") choices=user_skill_choices select_title=_("Choose a skill...") %}
+{% else %}
+<div class="alert alert-warning border-0 rounded-3">
+<i class="fas fa-exclamation-triangle me-2"></i>
+{% trans "You need to create a skill first to request a swap!" %}
+<a href="{% url 'dash:skill_create' %}" class="alert-link">{% trans "Create a skill" %}</a>
+</div>
+{% endif %}
+</div>
+
+<div class="mb-4">
+<label for="message" class="form-label fw-bold">
+<i class="fas fa-comment text-primary me-1"></i>
+{% trans "Message" %}
+<span class="text-muted small fw-normal">({% trans "Optional" %})</span>
+</label>
+<textarea class="form-control rounded-3"
+id="message"
+name="message"
+rows="4"
+placeholder="{% trans 'Add a personal message to the skill owner...' %}"></textarea>
+</div>
+
+<div class="row g-3">
+<div class="col-md-6">
+<div class="mb-4">
+<label for="requester_pdf" class="form-label fw-bold">
+<i class="fas fa-file-pdf text-danger me-1"></i>
+{% trans "PDF Document" %}
+<span class="text-muted small fw-normal">({% trans "Optional" %})</span>
+</label>
+<input type="file"
+class="form-control rounded-3"
+id="requester_pdf"
+name="requester_pdf"
+accept=".pdf">
+<small class="text-muted">{% trans "Share learning materials, guides, or resources" %}</small>
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="mb-4">
+<label for="requester_video" class="form-label fw-bold">
+<i class="fas fa-video text-primary me-1"></i>
+{% trans "Video File" %}
+<span class="text-muted small fw-normal">({% trans "Optional" %})</span>
+</label>
+<input type="file"
+class="form-control rounded-3"
+id="requester_video"
+name="requester_video"
+accept="video/*">
+<small class="text-muted">{% trans "Share a tutorial or demonstration video" %}</small>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card-footer bg-transparent border-0 p-4 pt-0">
+<button type="submit" class="btn btn-success w-100 rounded-3 py-3 fw-bold shadow-sm" {% if not user_skills %}disabled{% endif %}>
+<i class="fas fa-paper-plane me-2"></i>
+{% trans "Send Swap Request" %}
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+{% endblock dashContent %}

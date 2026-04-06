@@ -1,0 +1,135 @@
+{% extends "dash/dash_index.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block dashTitle %}
+{% trans "Accept Swap Request" %}
+{% endblock dashTitle %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/skills.css' %}?v={% now 'U' %}">
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script src="{% static 'js/skills.js' %}?v={% now 'U' %}"></script>
+{% endblock extra_js %}
+
+{% block dashContent %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 bg-white">
+                <div class="card-header bg-transparent border-0 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="fw-bold mb-0">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {% trans "Accept Swap Request" %}
+                        </h4>
+                        <a href="{% url 'dash:swap_request_detail' swap_request.pk %}" 
+                            class="btn btn-outline-secondary rounded-3">
+                            <i class="fas fa-times me-1"></i> {% trans "Cancel" %}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 border-bottom">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="bg-primary bg-opacity-5 rounded-3 p-3 border-start border-4 border-primary">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-hand-holding-heart text-primary me-2"></i>
+                                    <small class="text-muted text-uppercase fw-bold">{% trans "They Offer" %}</small>
+                                </div>
+                                <h6 class="fw-bold mb-1">{{ swap_request.offered_skill.skill_title }}</h6>
+                                <p class="text-muted small mb-0">{{ swap_request.requester.username }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-success bg-opacity-5 rounded-3 p-3 border-start border-4 border-success">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-bullseye text-success me-2"></i>
+                                    <small class="text-muted text-uppercase fw-bold">{% trans "You Offer" %}</small>
+                                </div>
+                                <h6 class="fw-bold mb-1">{{ swap_request.target_skill.skill_title }}</h6>
+                                <p class="text-muted small mb-0">{% trans "Your skill" %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<form id="acceptSwapForm" method="post" enctype="multipart/form-data" class="form" action="{% url 'dash:swap_request_accept' swap_request.pk %}">
+{% csrf_token %}
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-4">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {% trans "Share your learning materials with" %} {{ swap_request.requester.username }}
+                        </p>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="owner_pdf" class="form-label fw-bold">
+                                        <i class="fas fa-file-pdf text-danger me-1"></i>
+                                        {% trans "Your PDF Document" %}
+                                        <span class="text-muted small fw-normal">({% trans "Optional" %})</span>
+                                    </label>
+                                    <input type="file"
+                                        class="form-control rounded-3"
+                                        id="owner_pdf"
+                                        name="owner_pdf"
+                                        accept=".pdf">
+                                    <small class="text-muted">{% trans "Share guides, resources, or learning materials" %}</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="owner_video" class="form-label fw-bold">
+                                        <i class="fas fa-video text-primary me-1"></i>
+                                        {% trans "Your Video File" %}
+                                        <span class="text-muted small fw-normal">({% trans "Optional" %})</span>
+                                    </label>
+                                    <input type="file"
+                                        class="form-control rounded-3"
+                                        id="owner_video"
+                                        name="owner_video"
+                                        accept="video/*">
+                                    <small class="text-muted">{% trans "Share a tutorial or demonstration video" %}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if swap_request.requester_pdf or swap_request.requester_video %}
+                        <div class="mt-4 p-3 bg-light rounded-3">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fas fa-download text-primary me-2"></i>
+                                {% trans "Files from" %} {{ swap_request.requester.username }}
+                            </h6>
+                            <div class="d-flex gap-3 flex-wrap">
+                                {% if swap_request.requester_pdf %}
+                                <a href="{{ swap_request.requester_pdf.url }}" class="btn btn-outline-primary btn-sm rounded-3" target="_blank">
+                                    <i class="fas fa-file-pdf me-1"></i> {% trans "View PDF" %}
+                                </a>
+                                {% endif %}
+                                {% if swap_request.requester_video %}
+                                <a href="{{ swap_request.requester_video.url }}" class="btn btn-outline-primary btn-sm rounded-3" target="_blank">
+                                    <i class="fas fa-video me-1"></i> {% trans "View Video" %}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                        <button type="submit" class="btn btn-success w-100 rounded-3 py-3 fw-bold shadow-sm">
+                            <i class="fas fa-check me-2"></i>
+                            {% trans "Accept & Share Files" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock dashContent %}
