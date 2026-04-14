@@ -17,6 +17,7 @@ django-eventstream==5.3.3
 django-grip==3.5.2
 djlint==1.36.4
 editorconfig==0.17.1
+git-filter-repo==2.47.0
 gripcontrol==4.2.1
 hyperlink==21.0.0
 idna==3.11
@@ -29,6 +30,7 @@ packaging==26.0
 pathspec==0.12.1
 pillow==12.1.1
 pip==25.1.1
+psycopg2-binary==2.9.11
 pubcontrol==3.5.0
 py-ubjson==0.16.1
 pyasn1==0.6.3

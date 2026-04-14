@@ -43,7 +43,4 @@ def site_settings(request):
     Returns global site configuration and branding details.
     Uses cached settings to improve performance.
     """
-    return {
-        "site_config": _get_cached_site_settings()
-    }
-    }
+    return {"site_config": _get_cached_site_settings()}

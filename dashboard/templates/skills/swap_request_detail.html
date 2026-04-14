@@ -72,12 +72,12 @@
                         </h6>
                         <div class="d-flex gap-2 flex-wrap">
                             {% if swap_request.requester_pdf %}
-                            <a href="{{ swap_request.requester_pdf.url }}" class="btn btn-outline-primary btn-sm rounded-3" target="_blank">
+                            <a href="{{ swap_request.requester_pdf.url }}" class="btn btn-light btn-sm rounded-3" target="_blank">
                                 <i class="fas fa-file-pdf me-1"></i> {% trans "PDF" %}
                             </a>
                             {% endif %}
                             {% if swap_request.requester_video %}
-                            <a href="{{ swap_request.requester_video.url }}" class="btn btn-outline-primary btn-sm rounded-3" target="_blank">
+                            <a href="{{ swap_request.requester_video.url }}" class="btn btn-light btn-sm rounded-3" target="_blank">
                                 <i class="fas fa-video me-1"></i> {% trans "Video" %}
                             </a>
                             {% endif %}
@@ -127,7 +127,7 @@
                         </h6>
                         <div class="d-flex gap-2 flex-wrap">
                             {% if swap_request.owner_pdf %}
-                            <a href="{{ swap_request.owner_pdf.url }}" class="btn btn-outline-success btn-sm rounded-3" target="_blank">
+                            <a href="{{ swap_request.owner_pdf.url }}" class="btn btn-light btn-sm rounded-3" target="_blank">
                                 <i class="fas fa-file-pdf me-1"></i> {% trans "PDF" %}
                             </a>
                             {% endif %}
