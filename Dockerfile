@@ -16,7 +16,5 @@ CMD ["sh", "-c", "\
     DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-admin@example.com} \
     DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD} \
     python manage.py createsuperuser --noinput 2>/dev/null || true && \
-    python manage.py seed_categories && \
-    python manage.py seed_users 10 && \
     daphne -b 0.0.0.0 -p $PORT core.asgi:application \
 "]
