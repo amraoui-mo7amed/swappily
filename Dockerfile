@@ -16,6 +16,7 @@ ENV SQLITE_DB_PATH=/app/data/db.sqlite3
 
 CMD ["sh", "-c", "\
     python manage.py collectstatic --noinput && \
+    python manage.py migrate --run-syncdb && \
     python manage.py migrate && \
     DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME:-admin} \
     DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-admin@example.com} \

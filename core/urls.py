@@ -22,11 +22,13 @@ import django_eventstream
 from django.conf import settings
 from django.conf.urls.static import static
 from user_auth.views import login_view
+from frontend.views.main import health
 
 urlpatterns = [
     path("auth/", include("user_auth.urls", namespace="user_auth")),
     path("dashboard/", include("dashboard.urls", namespace="dash")),
     path("", login_view, name="login"),
+    path("health/", health, name="health"),
     path("i18n/", include("django.conf.urls.i18n")),
     # Notifications API
     path("events/", include(django_eventstream.urls)),
