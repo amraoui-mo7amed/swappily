@@ -10,4 +10,5 @@ app_name = "frontend"
 
 urlpatterns = [
     path('', main.home_view, name='home'),
+    path('health/', main.health, name='health'),
 ]
