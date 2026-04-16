@@ -1,111 +1,70 @@
-# Django Starter Kit
+# Swappily
 
-A robust, centralized, and highly customizable Django boilerplate designed for rapid project scaffolding. This kit focuses on a "Single Point of Truth" configuration, multi-language support (AR/EN/FR), and modern UI components.
+**Swappily** is a modern, AI-powered skill-swapping platform designed to connect people who want to learn through mutual exchange. Instead of paying with money, users trade their expertise, creating a collaborative learning environment.
 
-## Key Features
+## 🚀 Key Features
 
-- **Centralized Configuration**: Manage site name, logo, contact details, and SEO metadata from a single Python file (`core/context_processors.py`).
-- **Dynamic Branding**: UI colors are driven by CSS variables injected from the backend. Change your brand colors in one place, and the entire site (Dashboard & Frontend) updates instantly.
-- **Full i18n & RTL Support**: Built-in support for Arabic (RTL), English (LTR), and French (LTR) with automatic layout switching.
-- **Modern Component Library**: Ready-to-use generic components: Select tags, File Inputs, and specialized Pagination.
-- **AJAX-First Pattern**: Standardized form handling with loading states and translatable SweetAlert2/error list feedback.
+- **Skill Listing**: Users can showcase their expertise with detailed descriptions and images.
+- **Swap Requests**: Intuitive system to request a "swap" between two skills, including options to attach introductory videos or PDFs.
+- **Real-time Notifications**: Stay updated on request approvals, rejections, and new messages via structured system notifications.
+- **Dynamic Branding**: UI colors are driven by CSS variables injected from the backend, ensuring brand consistency.
+- **Multi-language Support**: Full RTL/LTR support for Arabic, English, and French.
+- **AJAX-First Interaction**: Optimized user experience with translatable SweetAlert2 feedback and seamless form handling.
 
-## Tech Stack
+## 📊 Database Schema
+
+The database schema visualization has been moved to [diagram.drawio](file:///home/mohamed/github/swappily/diagram.drawio). You can open it using the Draw.io integration in your editor.
+
+## 🛠️ Tech Stack
 
 - **Backend**: Django 5.2+
-- **Environment**: python-decouple
-- **Styling**: Bootstrap 5.3 + Variable-driven CSS
-- **Real-time**: Django EventStream + SSE
+- **Database**: SQLite (Development) / PostgreSQL (Production ready)
+- **Environment**: python-decouple for secure configuration.
+- **Styling**: Bootstrap 5.3 + Custom CSS Variables.
+- **UI/UX**: SweetAlert2 for dynamic user feedback.
 
-## Getting Started
+## 🛠️ Getting Started
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/amraoui-mo7amed/dj-starter-kit
+git clone https://github.com/amraoui-mo7amed/swappily
 pip install -r requirements.txt
 ```
 
 ### 2. Configure Environment
-Copy `.env.example` to `.env` and set your variables.
+Copy `.env.example` to `.env` and configure your settings.
 ```bash
 cp .env.example .env
 ```
 
-**Generate a Safe Secret Key:**
-Run this command to generate a secure key for `APP_SECRET`:
+**Generate a Secret Key:**
 ```bash
 python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 ```
 
-| Variable | Description |
-|----------|-------------|
-| `APP_SECRET` | Your Django secret key (generate a unique one for production). |
-| `APP_ENV` | Set to `development` for local work or `production` to disable debug mode. |
-| `APP_ALLOWED_HOSTS` | Comma-separated list of domains (e.g., `localhost,127.0.0.1,yourdomain.com`). |
-| `EMAIL_*` | SMTP settings for account activation and notification emails. |
-
-### 3. Database Setup
+### 3. Database Migration
 ```bash
 python manage.py migrate
 ```
 
-### 4. Create Superuser (Admin)
-To access the dashboard management features and Django admin:
+### 4. Create Admin User
 ```bash
 python manage.py createsuperuser
 ```
 
-### 5. Seed Database (Optional)
-Generate randomized generic user profiles for development:
-```bash
-python manage.py seed_users 10
-```
+## 📖 Development Guide
 
-## Development Guide
-
-### Creating an AJAX-Compatible View
-The project uses a centralized JavaScript handler for forms with the `.form` class. To make a view compatible with the `errorList.html` partial and SweetAlert feedback, return a `JsonResponse` as follows:
+### AJAX Form Handling
+The project uses a centralized JavaScript handler for any form with the `.form` class. Return a `JsonResponse` from your view:
 
 ```python
-from django.http import JsonResponse
-from django.utils.translation import gettext_lazy as _
-
-def your_view(request):
-    if request.method == "POST":
-        # 1. Validation Logic
-        errors = []
-        if not request.POST.get("name"):
-            errors.append(_("Name is required."))
-        
-        if errors:
-            return JsonResponse({"success": False, "errors": errors})
-
-        # 2. Processing Logic
-        # ... your code ...
-
-        # 3. Success Response
-        return JsonResponse({
-            "success": True,
-            "message": _("Action completed successfully!"),
-            "redirect_url": "/dashboard/success/" # Optional redirect
-        })
+return JsonResponse({
+    "success": True,
+    "message": _("Skill added successfully!"),
+    "redirect_url": "/dashboard/"
+})
 ```
 
-**Template Usage:**
-```html
-{% include "partials/errorList.html" with form_id="yourFormId" %}
-<form id="yourFormId" class="form" method="post">
-    ...
-</form>
-```
+## 📄 License
+This project is developed for educational and collaborative learning purposes.
 
-## Customization
-
-### 1. Project Identity
-Edit the `site_config` dictionary in `core/context_processors.py` to change branding, SEO, and contact details globally.
-
-### 2. Dashboard Navigation & RBAC
-Manage menu items in `dashboard/context_processors.py`. Use the `admin_only: True` flag to restrict specific links to superusers.
-
-## License
-This is a generic boilerplate for future projects. Customize and extend as needed.
